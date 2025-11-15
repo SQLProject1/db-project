@@ -6,6 +6,7 @@ CREATE TABLE users (
 
 CREATE TABLE todos (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id),
     content VARCHAR(100),
     due DATETIME
 );
