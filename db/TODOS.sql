@@ -12,7 +12,7 @@ CREATE TABLE todos (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE kriminellen ( 
+CREATE TABLE kriminelle ( 
 foto INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(40) ,
     geburtsdatum CHAR(10),
