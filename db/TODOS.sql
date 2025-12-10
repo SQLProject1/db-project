@@ -30,7 +30,7 @@ CREATE TABLE verbrechen (
     
 );
 
-CREATE TABLE gefängnis (
+CREATE TABLE gefaengnis (
     efängnis_ID INT AUTO_INCREMENT PRIMARY KEY,
     Ort varchar(67),
     Sicherheitslevel varchar(1),
