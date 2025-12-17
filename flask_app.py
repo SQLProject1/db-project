@@ -153,3 +153,19 @@ def index():
     # todos = db_read("SELECT * FROM todos ORDER BY created_at DESC")
     
     return render_template("index.html", posts=posts)
+
+@app.route("/add_todo", methods=["POST"])
+@login_required
+def add_todo():
+    description = request.form["description"]
+    due_date = request.form.get("due_date")  # Optional
+    priority = request.form.get("priority", "medium")
+    
+    sql = """
+        INSERT INTO todos (description, due_date, priority, user_id)
+        VALUES (%s, %s, %s, %s)
+    """
+    params = (description, due_date, priority, current_user.id)
+    db_write(sql, params)
+    flash("Todo erfolgreich hinzugefügt!", "success")
+    return redirect(url_for("index"))
