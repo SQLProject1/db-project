@@ -124,6 +124,11 @@ def add_post():
 
     return redirect(url_for("index"))
 
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
 
     
 
