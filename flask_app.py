@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for, flash
 from dotenv import load_dotenv
 import os
 import git
@@ -44,25 +44,21 @@ def webhook():
         origin = repo.remotes.origin
         origin.pull()
         return 'Updated PythonAnywhere successfully', 200
-    return 'Unathorized', 401
+    return 'Unauthorized', 401
 
 # Auth routes
 @app.route("/login", methods=["GET", "POST"])
 def login():
     error = None
-
     if request.method == "POST":
         user = authenticate(
             request.form["username"],
             request.form["password"]
         )
-
         if user:
             login_user(user)
             return redirect(url_for("index"))
-
         error = "Benutzername oder Passwort ist falsch."
-
     return render_template(
         "auth.html",
         title="In dein Konto einloggen",
@@ -74,21 +70,16 @@ def login():
         footer_link_label="Registrieren"
     )
 
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     error = None
-
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-
         ok = register_user(username, password)
         if ok:
             return redirect(url_for("login"))
-
         error = "Benutzername existiert bereits."
-
     return render_template(
         "auth.html",
         title="Neues Konto erstellen",
@@ -106,29 +97,59 @@ def logout():
     logout_user()
     return redirect(url_for("index"))
 
-
-
 @app.route("/add_post", methods=["POST"])
 @login_required
 def add_post():
     title = request.form["title"]
     content = request.form["content"]
-
     sql = """
         INSERT INTO posts (title, content, user_id)
         VALUES (%s, %s, %s)
     """
     params = (title, content, current_user.id)
-
     db_write(sql, params)
+    flash("Post erfolgreich hinzugefügt!", "success")
+    return redirect(url_for("index"))
 
+# NEW ROUTE: Add generic data to any table
+@app.route("/add_data", methods=["POST"])
+@login_required
+def add_data():
+    table = request.form.get("table")
+    if not table:
+        flash("Keine Tabelle angegeben.", "error")
+        return redirect(url_for("index"))
+    
+    # Get all form data except table and csrf_token
+    data = {key: value for key, value in request.form.items() 
+            if key not in ["table", "csrf_token"]}
+    
+    if not data:
+        flash("Keine Daten zum Hinzufügen.", "error")
+        return redirect(url_for("index"))
+    
+    # Build SQL query dynamically
+    columns = ", ".join(data.keys())
+    placeholders = ", ".join(["%s"] * len(data))
+    sql = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
+    params = tuple(data.values())
+    
+    try:
+        db_write(sql, params)
+        flash(f"Daten erfolgreich zu {table} hinzugefügt!", "success")
+    except Exception as e:
+        flash(f"Fehler beim Hinzufügen der Daten: {str(e)}", "error")
+    
     return redirect(url_for("index"))
 
 @app.route("/")
 def index():
-    return render_template("index.html")
-
-
-
+    # Fetch existing posts to show on the front page
+    sql = "SELECT * FROM posts ORDER BY created_at DESC"
+    posts = db_read(sql)
     
-
+    # You can also fetch other tables if needed
+    # For example, if you have a 'todos' table:
+    # todos = db_read("SELECT * FROM todos ORDER BY created_at DESC")
+    
+    return render_template("index.html", posts=posts)
