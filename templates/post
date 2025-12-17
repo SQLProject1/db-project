@@ -1,0 +1,5 @@
+<form method="POST" action="{{ url_for('add_post') }}">
+    <input type="text" name="title" placeholder="Title" required>
+    <textarea name="content" placeholder="Content" required></textarea>
+    <button type="submit">Add Post</button>
+</form>
