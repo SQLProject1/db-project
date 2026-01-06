@@ -174,5 +174,54 @@ if __name__ == "__main__":
 
 
 
+@app.route("/kriminelle", methods=["POST"])
+@login_required
+def add_kriminelle():
+    name = request.form["name"]
+    geburtsdatum = request.form["geburtsdatum"]
+    rasse = request.form["rasse"]
+    haftstatus = 1 if request.form.get("haftstatus") else 0
+    geschlecht = request.form["geschlecht"]
+
+    db_write("""
+        INSERT INTO kriminelle
+        (name, geburtsdatum, rasse, haftstatus, geschlecht)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (name, geburtsdatum, rasse, haftstatus, geschlecht))
+
+    return redirect(url_for("index"))
+
+@app.route("/verbrechen", methods=["POST"])
+@login_required
+def add_verbrechen():
+    verbrechenstyp = request.form["verbrechenstyp"]
+    geldstrafe = request.form["geldstrafe"]
+    gefaengniszeit = request.form["gefaengniszeit"]
+    vergehen = 1 if request.form.get("vergehen") else 0
+
+    db_write("""
+        INSERT INTO verbrechen
+        (verbrechenstyp, geldsstrafe, gefängniszeit, vergehen_oder_verbrechen)
+        VALUES (%s, %s, %s, %s)
+    """, (verbrechenstyp, geldstrafe, gefaengniszeit, vergehen))
+
+    return redirect(url_for("index"))
+
+@app.route("/gefaengnis", methods=["POST"])
+@login_required
+def add_gefaengnis():
+    ort = request.form["ort"]
+    sicherheitslevel = request.form["sicherheitslevel"]
+
+    db_write(
+        "INSERT INTO gefaengnis (Ort, Sicherheitslevel) VALUES (%s, %s)",
+        (ort, sicherheitslevel)
+    )
+
+    return redirect(url_for("index"))
+
+
+
+
 
 
