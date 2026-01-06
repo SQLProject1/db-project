@@ -22,9 +22,10 @@ foto INT AUTO_INCREMENT PRIMARY KEY,
 );
 
 CREATE TABLE verbrechen (
+
     anklagepunkt INT AUTO_INCREMENT PRIMARY KEY,
     verbrechenstyp VARCHAR(20),
-    geldsstrafe FLOAT,
+    geldsstrafe varchar(10),
     gefängniszeit CHAR(10),
     vergehen_oder_verbrechen BOOL,
     
