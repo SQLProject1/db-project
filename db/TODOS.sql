@@ -27,14 +27,14 @@ CREATE TABLE verbrechen (
     verbrechenstyp VARCHAR(20),
     geldsstrafe varchar(10),
     gefängniszeit CHAR(10),
-    vergehen_oder_verbrechen BOOL,
+    vergehen_oder_verbrechen BOOL
     
 );
 
 CREATE TABLE gefaengnis (
     gefängnis_ID INT AUTO_INCREMENT PRIMARY KEY,
     Ort varchar(67),
-    Sicherheitslevel varchar(1),
+    Sicherheitslevel varchar(1)
 );
     
     
