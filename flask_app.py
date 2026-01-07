@@ -112,7 +112,7 @@ def add_post():
     return redirect(url_for("index"))
 
 # NEW ROUTE: Add generic data to any table
-@app.route("/add_data", methods=["POST"])
+"""@app.route("/add_data", methods=["POST"])
 @login_required
 def add_data():
     table = request.form.get("table")
@@ -141,6 +141,7 @@ def add_data():
         flash(f"Fehler beim Hinzufügen der Daten: {str(e)}", "error")
     
     return redirect(url_for("index"))
+"""
 
 @app.route("/")
 def index():
