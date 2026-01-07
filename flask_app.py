@@ -205,7 +205,18 @@ def add_verbrechen():
         VALUES (%s, %s, %s, %s)
     """, (verbrechenstyp, geldstrafe, gefaengniszeit, vergehen))
 
-    return redirect(url_for("index"))
+@app.route("/gefaengnis", methods=["POST"])
+@login_required
+def add_gefaengnis():
+    ort = request.form["ort"]
+    sicherheitslevel = request.form["sicherheitslevel"]
+
+    db_write(
+        "INSERT INTO gefaengnis (Ort, Sicherheitslevel) VALUES (%s, %s)",
+        (ort, sicherheitslevel)
+    )
+
+   
 
 
 
