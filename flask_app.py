@@ -217,7 +217,183 @@ def add_gefaengnis():
         (ort, sicherheitslevel)
     )
 
-   
+# ---------------------------
+# Generic "insert into any table" page
+# ---------------------------
+
+def _row_get(row, key, idx=None):
+    """db_read may return dict rows (cursor(dictionary=True)) or tuples; support both."""
+    if isinstance(row, dict):
+        return row.get(key)
+    if idx is not None:
+        return row[idx]
+    return None
+
+def _quote_ident(name: str) -> str:
+    """Safely quote an identifier with backticks (table/column)."""
+    return "`" + name.replace("`", "``") + "`"
+
+def _parse_enum_set(column_type: str):
+    """
+    column_type like: enum('a','b') or set('x','y')
+    Returns list of values or None.
+    """
+    if not column_type:
+        return None
+    m = re.match(r"^(enum|set)\((.*)\)$", column_type.strip(), flags=re.IGNORECASE)
+    if not m:
+        return None
+    inner = m.group(2)
+    vals = re.findall(r"'((?:\\'|[^'])*)'", inner)
+    return [v.replace("\\'", "'") for v in vals]
+
+def _list_tables():
+    rows = db_read("""
+        SELECT TABLE_NAME
+        FROM information_schema.tables
+        WHERE table_schema = DATABASE()
+        ORDER BY TABLE_NAME
+    """)
+    return [_row_get(r, "TABLE_NAME", 0) for r in rows]
+
+def _get_columns(table_name: str):
+    rows = db_read("""
+        SELECT
+            COLUMN_NAME,
+            DATA_TYPE,
+            COLUMN_TYPE,
+            IS_NULLABLE,
+            COLUMN_DEFAULT,
+            EXTRA,
+            CHARACTER_MAXIMUM_LENGTH
+        FROM information_schema.columns
+        WHERE table_schema = DATABASE()
+          AND table_name = %s
+        ORDER BY ORDINAL_POSITION
+    """, (table_name,))
+
+    cols = []
+    for r in rows:
+        col_name = _row_get(r, "COLUMN_NAME", 0)
+        data_type = (_row_get(r, "DATA_TYPE", 1) or "").lower()
+        column_type = _row_get(r, "COLUMN_TYPE", 2) or ""
+        is_nullable = _row_get(r, "IS_NULLABLE", 3) or "YES"
+        col_default = _row_get(r, "COLUMN_DEFAULT", 4)
+        extra = (_row_get(r, "EXTRA", 5) or "").lower()
+        max_len = _row_get(r, "CHARACTER_MAXIMUM_LENGTH", 6)
+
+        # Skip auto-generated columns
+        if "auto_increment" in extra or "generated" in extra:
+            continue
+
+        # Decide widget/input type
+        enum_opts = _parse_enum_set(column_type)
+        if enum_opts:
+            input_type = "select"
+        elif data_type in ("text", "mediumtext", "longtext"):
+            input_type = "textarea"
+        elif data_type in ("datetime", "timestamp"):
+            input_type = "datetime-local"
+        elif data_type in ("date",):
+            input_type = "date"
+        elif data_type in ("time",):
+            input_type = "time"
+        elif data_type in ("int", "bigint", "smallint", "mediumint", "tinyint", "decimal", "float", "double"):
+            # Treat tinyint(1) as checkbox (common MySQL boolean pattern)
+            if data_type == "tinyint" and "(1)" in column_type.replace(" ", ""):
+                input_type = "checkbox"
+            else:
+                input_type = "number"
+        else:
+            input_type = "text"
+
+        required = (is_nullable == "NO" and col_default is None)
+
+        cols.append({
+            "name": col_name,
+            "data_type": data_type,
+            "column_type": column_type,
+            "required": required,
+            "default": col_default,
+            "input_type": input_type,
+            "max_len": max_len,
+            "enum_options": enum_opts or [],
+        })
+
+    return cols
+
+@app.route("/insert_data", methods=["GET", "POST"])
+@login_required
+def insert_data():
+    tables = _list_tables()
+
+    # Which table is selected?
+    selected_table = request.args.get("table") if request.method == "GET" else request.form.get("table")
+    if selected_table and selected_table not in tables:
+        flash("Unbekannte Tabelle.", "error")
+        return redirect(url_for("insert_data"))
+
+    columns = _get_columns(selected_table) if selected_table else []
+
+    if request.method == "POST":
+        if not selected_table:
+            flash("Bitte zuerst eine Tabelle auswählen.", "error")
+            return redirect(url_for("insert_data"))
+
+        if not columns:
+            flash("Für diese Tabelle wurden keine einfügbaren Spalten gefunden (evtl. nur AUTO_INCREMENT/GENERATED).", "error")
+            return redirect(url_for("insert_data", table=selected_table))
+
+        insert_cols = []
+        values = []
+
+        for c in columns:
+            name = c["name"]
+            itype = c["input_type"]
+
+            # Checkboxes submit only when checked
+            if itype == "checkbox":
+                val = 1 if request.form.get(name) == "on" else 0
+            else:
+                val = request.form.get(name, "").strip()
+                if val == "":
+                    val = None
+
+            # Required check
+            if c["required"] and val is None:
+                flash(f"Feld '{name}' ist erforderlich.", "error")
+                return redirect(url_for("insert_data", table=selected_table))
+
+            # Convert datetime-local "YYYY-MM-DDTHH:MM" -> "YYYY-MM-DD HH:MM:SS"
+            if val is not None and c["data_type"] in ("datetime", "timestamp"):
+                if "T" in val:
+                    val = val.replace("T", " ")
+                if len(val) == 16:  # no seconds
+                    val = val + ":00"
+
+            insert_cols.append(name)
+            values.append(val)
+
+        cols_sql = ", ".join(_quote_ident(c) for c in insert_cols)
+        placeholders = ", ".join(["%s"] * len(insert_cols))
+        sql = f"INSERT INTO {_quote_ident(selected_table)} ({cols_sql}) VALUES ({placeholders})"
+
+        try:
+            db_write(sql, tuple(values))
+            flash(f"Eintrag in '{selected_table}' gespeichert.", "success")
+        except Exception as e:
+            logging.exception("Insert failed")
+            flash(f"Insert fehlgeschlagen: {e}", "error")
+
+        return redirect(url_for("insert_data", table=selected_table))
+
+    return render_template(
+        "insert_data.html",
+        tables=tables,
+        selected_table=selected_table,
+        columns=columns,
+    )
+
 
 
 
