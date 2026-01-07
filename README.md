@@ -1,4 +1,5 @@
-# 📘 Projekt-Anleitung: Flask + MySQL auf PythonAnywhereTest
+# 📘 Projekt-Anleitung: Flas BAUM 
+k + MySQL auf PythonAnywhereTest
 Diese Anleitung beschreibt den kompletten Ablauf, um das Projekt auszuführen und im Team (GitHub + PythonAnywhere) zu entwickeln.
 
 **Hinweis:** Nur eine Person pro Team muss diese Anleitung durchführen.
