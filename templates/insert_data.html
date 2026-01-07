@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="content-card">
+    <h2 style="margin-bottom: 0.75rem;">Daten einfügen</h2>
+    <p class="help-block" style="margin-top: 0;">
+      Wähle eine Tabelle aus und füge einen neuen Datensatz hinzu.
+    </p>
+
+    <!-- Table selector (GET) -->
+    <form method="GET" action="{{ url_for('insert_data') }}" class="todo-form" style="margin-bottom: 1.25rem;">
+      <div class="form-group">
+        <label for="table">Tabelle</label>
+        <select id="table" name="table" class="form-control" onchange="this.form.submit()">
+          <option value="">-- bitte wählen --</option>
+          {% for t in tables %}
+            <option value="{{ t }}" {% if selected_table == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+        <p class="help-block">Beim Wechsel wird das Formular automatisch geladen.</p>
+      </div>
+    </form>
+
+    {% if selected_table %}
+      <hr style="opacity: 0.2; margin: 1.25rem 0;" />
+
+      <h3 style="margin-bottom: 0.75rem;">Neuer Eintrag: {{ selected_table }}</h3>
+
+      <!-- Insert form (POST) -->
+      <form method="POST" action="{{ url_for('insert_data') }}" class="todo-form">
+        <input type="hidden" name="table" value="{{ selected_table }}">
+
+        {% for col in columns %}
+          <div class="form-group">
+            <label for="{{ col.name }}">{{ col.name }}</label>
+
+            {% if col.input_type == "textarea" %}
+              <textarea
+                id="{{ col.name }}"
+                name="{{ col.name }}"
+                class="form-control"
+                {% if col.required %}required{% endif %}
+                {% if col.max_len %}maxlength="{{ col.max_len }}"{% endif %}
+                rows="4"
+              ></textarea>
+
+            {% elif col.input_type == "select" %}
+              <select
+                id="{{ col.name }}"
+                name="{{ col.name }}"
+                class="form-control"
+                {% if col.required %}required{% endif %}
+              >
+                <option value="">-- bitte wählen --</option>
+                {% for opt in col.enum_options %}
+                  <option value="{{ opt }}">{{ opt }}</option>
+                {% endfor %}
+              </select>
+
+            {% elif col.input_type == "checkbox" %}
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <input
+                  id="{{ col.name }}"
+                  name="{{ col.name }}"
+                  type="checkbox"
+                  class="todo-checkbox"
+                />
+                <span class="help-block" style="margin:0;">(aktiviert = 1, deaktiviert = 0)</span>
+              </div>
+
+            {% else %}
+              <input
+                id="{{ col.name }}"
+                name="{{ col.name }}"
+                type="{{ col.input_type }}"
+                class="form-control"
+                {% if col.required %}required{% endif %}
+                {% if col.max_len and col.input_type == "text" %}maxlength="{{ col.max_len }}"{% endif %}
+              >
+            {% endif %}
+
+            <p class="help-block">
+              Typ: {{ col.data_type }}{% if col.column_type %} ({{ col.column_type }}){% endif %}
+              {% if col.required %} • erforderlich{% else %} • optional{% endif %}
+            </p>
+          </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Hinzufügen</button>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}
