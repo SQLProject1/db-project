@@ -221,58 +221,7 @@ def add_gefaengnis():
     return redirect(url_for("index"))
 
 
-# Allowed tables and their columns (SECURITY!)
-ALLOWED_TABLES = {
-    "posts": ["title", "content", "user_id"],
-    "todos": ["content", "due", "user_id"],
-    "kriminelle": ["name", "geburtsdatum", "rasse", "haftstatus", "geschlecht"],
-    "verbrechen": ["verbrechenstyp", "geldsstrafe", "gefängniszeit", "vergehen_oder_verbrechen"],
-    "gefaengnis": ["Ort", "Sicherheitslevel"]
-}
 
-
-@app.route("/add_data", methods=["POST"])
-@login_required
-def add_data():
-    table = request.form.get("table")
-
-    if table not in ALLOWED_TABLES:
-        flash("Ungültige Tabelle.", "error")
-        return redirect(url_for("index"))
-
-    allowed_columns = ALLOWED_TABLES[table]
-
-    data = {}
-    for col in allowed_columns:
-        if col in request.form:
-            value = request.form[col]
-
-            # Handle checkbox booleans
-            if value == "on":
-                value = 1
-
-            data[col] = value
-
-    # Automatically attach user_id if required
-    if "user_id" in allowed_columns:
-        data["user_id"] = current_user.id
-
-    if not data:
-        flash("Keine gültigen Daten übermittelt.", "error")
-        return redirect(url_for("index"))
-
-    columns = ", ".join(data.keys())
-    placeholders = ", ".join(["%s"] * len(data))
-
-    sql = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
-
-    try:
-        db_write(sql, tuple(data.values()))
-        flash("Daten erfolgreich gespeichert!", "success")
-    except Exception as e:
-        flash(f"Fehler: {e}", "error")
-
-    return redirect(url_for("index"))
 
 
 
