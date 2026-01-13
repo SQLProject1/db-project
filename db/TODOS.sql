@@ -40,6 +40,7 @@ CREATE TABLE gefaengnis (
 CREATE TABLE posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255),
+    test CHAR (67),
     content TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
