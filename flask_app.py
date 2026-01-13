@@ -332,7 +332,7 @@ def index():
     selected_table = request.args.get("table") if request.method == "GET" else request.form.get("table")
     if selected_table and selected_table not in tables:
         flash("Unbekannte Tabelle.", "error")
-        return redirect(url_for("index"))
+        return redirect(url_for("index.htmlx"))
 
     columns = _get_columns(selected_table) if selected_table else []
 
@@ -363,7 +363,7 @@ def index():
             # Required check
             if c["required"] and val is None:
                 flash(f"Feld '{name}' ist erforderlich.", "error")
-                return redirect(url_for("index", table=selected_table))
+                return redirect(url_for("index.html", table=selected_table))
 
             # Convert datetime-local "YYYY-MM-DDTHH:MM" -> "YYYY-MM-DD HH:MM:SS"
             if val is not None and c["data_type"] in ("datetime", "timestamp"):
@@ -389,7 +389,7 @@ def index():
         return redirect(url_for("index", table=selected_table))
 
     return render_template(
-        "index.html",
+        "index",
         tables=tables,
         selected_table=selected_table,
         columns=columns,
