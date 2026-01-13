@@ -323,27 +323,27 @@ def _get_columns(table_name: str):
 
     return cols
 
-@app.route("/index", methods=["GET", "POST"])
+@app.route("/insert_data", methods=["GET", "POST"])
 @login_required
-def index():
+def insert_data():
     tables = _list_tables()
 
     # Which table is selected?
     selected_table = request.args.get("table") if request.method == "GET" else request.form.get("table")
     if selected_table and selected_table not in tables:
         flash("Unbekannte Tabelle.", "error")
-        return redirect(url_for("index.html"))
+        return redirect(url_for("insert_data"))
 
     columns = _get_columns(selected_table) if selected_table else []
 
     if request.method == "POST":
         if not selected_table:
             flash("Bitte zuerst eine Tabelle auswählen.", "error")
-            return redirect(url_for("index"))
+            return redirect(url_for("insert_data"))
 
         if not columns:
             flash("Für diese Tabelle wurden keine einfügbaren Spalten gefunden (evtl. nur AUTO_INCREMENT/GENERATED).", "error")
-            return redirect(url_for("index", table=selected_table))
+            return redirect(url_for("insert_data", table=selected_table))
 
         insert_cols = []
         values = []
@@ -363,7 +363,7 @@ def index():
             # Required check
             if c["required"] and val is None:
                 flash(f"Feld '{name}' ist erforderlich.", "error")
-                return redirect(url_for("index.html", table=selected_table))
+                return redirect(url_for("insert_data", table=selected_table))
 
             # Convert datetime-local "YYYY-MM-DDTHH:MM" -> "YYYY-MM-DD HH:MM:SS"
             if val is not None and c["data_type"] in ("datetime", "timestamp"):
@@ -386,10 +386,10 @@ def index():
             logging.exception("Insert failed")
             flash(f"Insert fehlgeschlagen: {e}", "error")
 
-        return redirect(url_for("index", table=selected_table))
+        return redirect(url_for("insert_data", table=selected_table))
 
     return render_template(
-        "index",
+        "insert_data",
         tables=tables,
         selected_table=selected_table,
         columns=columns,
