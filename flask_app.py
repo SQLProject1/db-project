@@ -58,7 +58,7 @@ def login():
         )
         if user:
             login_user(user)
-            return redirect(url_for("insert_data"))
+            return redirect(url_for("index"))
         error = "Benutzername oder Passwort ist falsch."
     return render_template(
         "auth.html",
@@ -96,7 +96,7 @@ def register():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("insert_data"))
+    return redirect(url_for("index"))
 
 @app.route("/add_post", methods=["POST"])
 @login_required
@@ -110,7 +110,7 @@ def add_post():
     params = (title, content, current_user.id)
     db_write(sql, params)
     flash("Post erfolgreich hinzugefügt!", "success")
-    return redirect(url_for("insert_data"))
+    return redirect(url_for("index"))
 
 # NEW ROUTE: Add generic data to any table
 """@app.route("/add_data", methods=["POST"])
@@ -119,7 +119,7 @@ def add_data():
     table = request.form.get("table")
     if not table:
         flash("Keine Tabelle angegeben.", "error")
-        return redirect(url_for("insert_data"))
+        return redirect(url_for("index"))
     
     # Get all form data except table and csrf_token
     data = {key: value for key, value in request.form.items() 
@@ -127,7 +127,7 @@ def add_data():
     
     if not data:
         flash("Keine Daten zum Hinzufügen.", "error")
-        return redirect(url_for("insert_data"))
+        return redirect(url_for("index"))
     
     # Build SQL query dynamically
     columns = ", ".join(data.keys())
@@ -141,11 +141,11 @@ def add_data():
     except Exception as e:
         flash(f"Fehler beim Hinzufügen der Daten: {str(e)}", "error")
     
-    return redirect(url_for("insert_data"))
+    return redirect(url_for("index"))
 """
 
 @app.route("/")
-def insert_data():
+def index():
     # Fetch existing posts to show on the front page
     sql = "SELECT * FROM posts ORDER BY created_at DESC"
     posts = db_read(sql)
@@ -154,7 +154,7 @@ def insert_data():
     # For example, if you have a 'todos' table:
     # todos = db_read("SELECT * FROM todos ORDER BY created_at DESC")
     
-    return render_template("insert_data.html", posts=posts)
+    return render_template("index.html", posts=posts)
 
 @app.route("/add_todo", methods=["POST"])
 @login_required
@@ -170,7 +170,7 @@ def add_todo():
     params = (description, due_date, priority, current_user.id)
     db_write(sql, params)
     flash("Todo erfolgreich hinzugefügt!", "success")
-    return redirect(url_for("insert_data"))
+    return redirect(url_for("index"))
 #if __name__ == "__main__":
     app.run()
 
@@ -191,7 +191,7 @@ def add_kriminelle():
         VALUES (%s, %s, %s, %s, %s)
     """, (name, geburtsdatum, rasse, haftstatus, geschlecht))
 
-    return redirect(url_for("insert_data"))
+    return redirect(url_for("index"))
 
 @app.route("/verbrechen", methods=["POST"])
 @login_required
@@ -323,27 +323,27 @@ def _get_columns(table_name: str):
 
     return cols
 
-@app.route("/insert_data", methods=["GET", "POST"])
+@app.route("/index", methods=["GET", "POST"])
 @login_required
-def insert_data():
+def index():
     tables = _list_tables()
 
     # Which table is selected?
     selected_table = request.args.get("table") if request.method == "GET" else request.form.get("table")
     if selected_table and selected_table not in tables:
         flash("Unbekannte Tabelle.", "error")
-        return redirect(url_for("insert_data"))
+        return redirect(url_for("index"))
 
     columns = _get_columns(selected_table) if selected_table else []
 
     if request.method == "POST":
         if not selected_table:
             flash("Bitte zuerst eine Tabelle auswählen.", "error")
-            return redirect(url_for("insert_data"))
+            return redirect(url_for("index"))
 
         if not columns:
             flash("Für diese Tabelle wurden keine einfügbaren Spalten gefunden (evtl. nur AUTO_INCREMENT/GENERATED).", "error")
-            return redirect(url_for("insert_data", table=selected_table))
+            return redirect(url_for("index", table=selected_table))
 
         insert_cols = []
         values = []
@@ -363,7 +363,7 @@ def insert_data():
             # Required check
             if c["required"] and val is None:
                 flash(f"Feld '{name}' ist erforderlich.", "error")
-                return redirect(url_for("insert_data", table=selected_table))
+                return redirect(url_for("index", table=selected_table))
 
             # Convert datetime-local "YYYY-MM-DDTHH:MM" -> "YYYY-MM-DD HH:MM:SS"
             if val is not None and c["data_type"] in ("datetime", "timestamp"):
@@ -386,10 +386,10 @@ def insert_data():
             logging.exception("Insert failed")
             flash(f"Insert fehlgeschlagen: {e}", "error")
 
-        return redirect(url_for("insert_data", table=selected_table))
+        return redirect(url_for("index", table=selected_table))
 
     return render_template(
-        "insert_data.html",
+        "index.html",
         tables=tables,
         selected_table=selected_table,
         columns=columns,
