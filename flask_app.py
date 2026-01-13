@@ -98,9 +98,9 @@ def logout():
     logout_user()
     return redirect(url_for("index"))
 
-@app.route("/add", methods=["POST"])
+@app.route("/add_post", methods=["POST"])
 @login_required
-def add_data():
+def add_post():
     title = request.form["title"]
     content = request.form["content"]
     sql = """
