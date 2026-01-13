@@ -1,4 +1,4 @@
-# 📘 Projekt-Anleitung: Flas BAUMT
+# 📘 Projekt-Anleitung: Flas BAUM2
 k + MySQL auf PythonAnywhereTest
 Diese Anleitung beschreibt den kompletten Ablauf, um das Projekt auszuführen und im Team (GitHub + PythonAnywhere) zu entwickeln.
 
