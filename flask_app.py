@@ -154,7 +154,7 @@ def index():
     # For example, if you have a 'todos' table:
     # todos = db_read("SELECT * FROM todos ORDER BY created_at DESC")
     
-    return render_template("index", posts=posts)
+    return render_template("index.html", posts=posts)
 
 @app.route("/add_todo", methods=["POST"])
 @login_required
@@ -170,7 +170,7 @@ def add_todo():
     params = (description, due_date, priority, current_user.id)
     db_write(sql, params)
     flash("Todo erfolgreich hinzugefügt!", "success")
-    return redirect(url_for("index.html"))
+    return redirect(url_for("index"))
 #if __name__ == "__main__":
     app.run()
 
