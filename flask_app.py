@@ -113,9 +113,9 @@ def add_post():
     return redirect(url_for("index"))
 
 # NEW ROUTE: Add generic data to any table
-"""@app.route("/add_data", methods=["POST"])
+"""@app.route("/add_post", methods=["POST"])
 @login_required
-def add_data():
+def add_post():
     table = request.form.get("table")
     if not table:
         flash("Keine Tabelle angegeben.", "error")
