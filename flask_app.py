@@ -58,7 +58,7 @@ def login():
         )
         if user:
             login_user(user)
-            return redirect(url_for("main_page"))
+            return redirect(url_for("insert_data"))
         error = "Benutzername oder Passwort ist falsch."
     return render_template(
         "auth.html",
@@ -96,7 +96,7 @@ def register():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("main_page"))
+    return redirect(url_for("insert_data"))
 
 @app.route("/add_post", methods=["POST"])
 @login_required
@@ -110,7 +110,7 @@ def add_post():
     params = (title, content, current_user.id)
     db_write(sql, params)
     flash("Post erfolgreich hinzugefügt!", "success")
-    return redirect(url_for("main_page"))
+    return redirect(url_for("insert_data"))
 
 # NEW ROUTE: Add generic data to any table
 """@app.route("/add_data", methods=["POST"])
@@ -119,7 +119,7 @@ def add_data():
     table = request.form.get("table")
     if not table:
         flash("Keine Tabelle angegeben.", "error")
-        return redirect(url_for("main_page"))
+        return redirect(url_for("insert_data"))
     
     # Get all form data except table and csrf_token
     data = {key: value for key, value in request.form.items() 
@@ -127,7 +127,7 @@ def add_data():
     
     if not data:
         flash("Keine Daten zum Hinzufügen.", "error")
-        return redirect(url_for("main_page"))
+        return redirect(url_for("insert_data"))
     
     # Build SQL query dynamically
     columns = ", ".join(data.keys())
@@ -141,11 +141,11 @@ def add_data():
     except Exception as e:
         flash(f"Fehler beim Hinzufügen der Daten: {str(e)}", "error")
     
-    return redirect(url_for("main_page"))
+    return redirect(url_for("insert_data"))
 """
 
 @app.route("/")
-def main_page():
+def insert_data():
     # Fetch existing posts to show on the front page
     sql = "SELECT * FROM posts ORDER BY created_at DESC"
     posts = db_read(sql)
@@ -154,7 +154,7 @@ def main_page():
     # For example, if you have a 'todos' table:
     # todos = db_read("SELECT * FROM todos ORDER BY created_at DESC")
     
-    return render_template("main_page.html", posts=posts)
+    return render_template("insert_data.html", posts=posts)
 
 @app.route("/add_todo", methods=["POST"])
 @login_required
@@ -170,7 +170,7 @@ def add_todo():
     params = (description, due_date, priority, current_user.id)
     db_write(sql, params)
     flash("Todo erfolgreich hinzugefügt!", "success")
-    return redirect(url_for("main_page"))
+    return redirect(url_for("insert_data"))
 #if __name__ == "__main__":
     app.run()
 
@@ -191,7 +191,7 @@ def add_kriminelle():
         VALUES (%s, %s, %s, %s, %s)
     """, (name, geburtsdatum, rasse, haftstatus, geschlecht))
 
-    return redirect(url_for("main_page"))
+    return redirect(url_for("insert_data"))
 
 @app.route("/verbrechen", methods=["POST"])
 @login_required
