@@ -172,7 +172,7 @@ def add_todo():
     flash("Todo erfolgreich hinzugefügt!", "success")
     return redirect(url_for("index"))
 #if __name__ == "__main__":
-   # app.run()
+ app.run()
 
 
 
