@@ -44,7 +44,8 @@
                 <h5>Neuen Post hinzufügen</h5>
             </div>
             <div class="card-body">
-                <form action="{{ url_for('add_post') }}" method="POST">
+                <form action="{{ url_for('insert_data') }}" method="POST">
+                    <input type="hidden" name="table" value="posts">
                     <div class="mb-3">
                         <label for="title" class="form-label">Titel</label>
                         <input type="text" class="form-control" id="title" name="title" required>
