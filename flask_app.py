@@ -389,7 +389,7 @@ def insert_data():
         return redirect(url_for("insert_data", table=selected_table))
 
     return render_template(
-        "insert_data",
+        "insert_data.html",
         tables=tables,
         selected_table=selected_table,
         columns=columns,
