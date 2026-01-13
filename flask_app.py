@@ -98,9 +98,9 @@ def logout():
     logout_user()
     return redirect(url_for("index"))
 
-@app.route("/add_post", methods=["POST"])
+@app.route("/add_data", methods=["POST"])
 @login_required
-def add_post():
+def add_data():
     title = request.form["title"]
     content = request.form["content"]
     sql = """
@@ -113,9 +113,9 @@ def add_post():
     return redirect(url_for("index"))
 
 # NEW ROUTE: Add generic data to any table
-"""@app.route("/add_post", methods=["POST"])
+"""@app.route("/add_data", methods=["POST"])
 @login_required
-def add_post():
+def add_data():
     table = request.form.get("table")
     if not table:
         flash("Keine Tabelle angegeben.", "error")
