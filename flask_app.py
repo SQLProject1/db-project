@@ -58,7 +58,7 @@ def login():
         )
         if user:
             login_user(user)
-            return redirect(url_for("index"))
+            return redirect(url_for("index.html"))
         error = "Benutzername oder Passwort ist falsch."
     return render_template(
         "auth.html",
@@ -110,7 +110,7 @@ def add_post():
     params = (title, content, current_user.id)
     db_write(sql, params)
     flash("Post erfolgreich hinzugefügt!", "success")
-    return redirect(url_for("index"))
+    return redirect(url_for("index.html"))
 
 # NEW ROUTE: Add generic data to any table
 """@app.route("/add_data", methods=["POST"])
@@ -119,7 +119,7 @@ def add_data():
     table = request.form.get("table")
     if not table:
         flash("Keine Tabelle angegeben.", "error")
-        return redirect(url_for("index"))
+        return redirect(url_for("index.html"))
     
     # Get all form data except table and csrf_token
     data = {key: value for key, value in request.form.items() 
@@ -127,7 +127,7 @@ def add_data():
     
     if not data:
         flash("Keine Daten zum Hinzufügen.", "error")
-        return redirect(url_for("index"))
+        return redirect(url_for("index.html"))
     
     # Build SQL query dynamically
     columns = ", ".join(data.keys())
@@ -141,7 +141,7 @@ def add_data():
     except Exception as e:
         flash(f"Fehler beim Hinzufügen der Daten: {str(e)}", "error")
     
-    return redirect(url_for("index"))
+    return redirect(url_for("index.html"))
 """
 
 @app.route("/")
@@ -170,7 +170,7 @@ def add_todo():
     params = (description, due_date, priority, current_user.id)
     db_write(sql, params)
     flash("Todo erfolgreich hinzugefügt!", "success")
-    return redirect(url_for("index"))
+    return redirect(url_for("index.html"))
 #if __name__ == "__main__":
     app.run()
 
@@ -191,7 +191,7 @@ def add_kriminelle():
         VALUES (%s, %s, %s, %s, %s)
     """, (name, geburtsdatum, rasse, haftstatus, geschlecht))
 
-    return redirect(url_for("index"))
+    return redirect(url_for("index.html"))
 
 @app.route("/verbrechen", methods=["POST"])
 @login_required
@@ -332,18 +332,18 @@ def index():
     selected_table = request.args.get("table") if request.method == "GET" else request.form.get("table")
     if selected_table and selected_table not in tables:
         flash("Unbekannte Tabelle.", "error")
-        return redirect(url_for("index.htmlx"))
+        return redirect(url_for("index.html"))
 
     columns = _get_columns(selected_table) if selected_table else []
 
     if request.method == "POST":
         if not selected_table:
             flash("Bitte zuerst eine Tabelle auswählen.", "error")
-            return redirect(url_for("index"))
+            return redirect(url_for("index.html"))
 
         if not columns:
             flash("Für diese Tabelle wurden keine einfügbaren Spalten gefunden (evtl. nur AUTO_INCREMENT/GENERATED).", "error")
-            return redirect(url_for("index", table=selected_table))
+            return redirect(url_for("index.html", table=selected_table))
 
         insert_cols = []
         values = []
@@ -386,7 +386,7 @@ def index():
             logging.exception("Insert failed")
             flash(f"Insert fehlgeschlagen: {e}", "error")
 
-        return redirect(url_for("index", table=selected_table))
+        return redirect(url_for("index.html", table=selected_table))
 
     return render_template(
         "index",
