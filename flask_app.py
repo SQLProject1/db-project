@@ -180,15 +180,15 @@ def add_todo():
 def add_kriminelle():
     name = request.form["name"]
     geburtsdatum = request.form["geburtsdatum"]
-    rasse = request.form["rasse"]
+    ethnie = request.form["ethnie"]
     haftstatus = 1 if request.form.get("haftstatus") else 0
     geschlecht = request.form["geschlecht"]
 
     db_write("""
         INSERT INTO kriminelle
-        (name, geburtsdatum, rasse, haftstatus, geschlecht)
+        (name, geburtsdatum, ethnie, haftstatus, geschlecht)
         VALUES (%s, %s, %s, %s, %s)
-    """, (name, geburtsdatum, rasse, haftstatus, geschlecht))
+    """, (name, geburtsdatum, ethnie, haftstatus, geschlecht))
 
     return redirect(url_for("index"))
 
