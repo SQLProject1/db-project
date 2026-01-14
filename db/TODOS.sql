@@ -16,7 +16,7 @@ CREATE TABLE kriminelle (
 foto INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(40) ,
     geburtsdatum CHAR(10),
-    rasse VARCHAR(20),
+    ethnie VARCHAR(20),
     haftstatus BOOL,
     geschlecht VARCHAR(10)
 );
