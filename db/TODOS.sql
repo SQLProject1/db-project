@@ -14,6 +14,7 @@ CREATE TABLE todos (
 
 CREATE TABLE kriminelle ( 
 foto INT AUTO_INCREMENT PRIMARY KEY,
+    ID CHAR(7),
     Name VARCHAR(40) ,
     Geschlecht VARCHAR(10),
     Ethnie VARCHAR(20),
