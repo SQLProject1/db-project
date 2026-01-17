@@ -394,7 +394,7 @@ def insert_data():
 @login_required
 def show_haeftlinge():
     haeftlinge = db_read("SELECT * FROM haeftlinge")
-    return render_template("table.html", title="haeftlinge", rows=haeftlinge)
+    return render_template("table.html", title="Häftlinge", rows=haeftlinge)
 
 
 @app.route("/verbrechen")
