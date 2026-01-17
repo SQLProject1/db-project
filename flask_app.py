@@ -171,22 +171,32 @@ def add_todo():
 
 
 
-@app.route("/haeftlinge/add", methods=["POST"])
+@app.route("/haeftlinge")
 @login_required
-def add_haeftlinge():
-    name = request.form["name"]
-    geburtsdatum = request.form["geburtsdatum"]
-    ethnie = request.form["ethnie"]
-    haftstatus = 1 if request.form.get("haftstatus") else 0
-    geschlecht = request.form["geschlecht"]
+def show_haeftlinge():
+    search_col = request.args.get("column")
+    search_val = request.args.get("q")
 
-    db_write("""
-        INSERT INTO haeftlinge
-        (name, geburtsdatum, ethnie, haftstatus, geschlecht)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (name, geburtsdatum, ethnie, haftstatus, geschlecht))
+    allowed_cols = _allowed_columns("haeftlinge")
 
-    return redirect(url_for("index"))
+    sql = "SELECT * FROM haeftlinge"
+    params = ()
+
+    if search_col in allowed_cols and search_val:
+        sql += f" WHERE {_quote_ident(search_col)} LIKE %s"
+        params = (f"%{search_val}%",)
+
+    haeftlinge = db_read(sql, params)
+
+    return render_template(
+        "table.html",
+        title="Häftlinge",
+        rows=haeftlinge,
+        columns=allowed_cols,
+        search_col=search_col,
+        search_val=search_val
+    )
+
 
 @app.route("/verbrechen/add", methods=["POST"])
 @login_required
@@ -202,20 +212,33 @@ def add_verbrechen():
         VALUES (%s, %s, %s, %s)
     """, (verbrechenstyp, geldstrafe, gefaengniszeit, vergehen))
 
-@app.route("/gefaengnis/add", methods=["POST"])
+@app.route("/gefaengnis")
 @login_required
-def add_gefaengnis():
-    ort = request.form["ort"]
-    sicherheitslevel = request.form["sicherheitslevel"]
+def show_gefaengnis():
+    search_col = request.args.get("column")
+    search_val = request.args.get("q")
 
-    db_write(
-        "INSERT INTO gefaengnis (Ort, Sicherheitslevel) VALUES (%s, %s)",
-        (ort, sicherheitslevel)
+    allowed_cols = _allowed_columns("gefaengnis")
+
+    sql = "SELECT * FROM gefaengnis"
+    params = ()
+
+    if search_col in allowed_cols and search_val:
+        sql += f" WHERE {_quote_ident(search_col)} LIKE %s"
+        params = (f"%{search_val}%",)
+
+    gefaengnis = db_read(sql, params)
+
+    return render_template(
+        "table.html",
+        title="Gefängnisse",
+        rows=gefaengnis,
+        columns=allowed_cols,
+        search_col=search_col,
+        search_val=search_val
     )
 
-# ---------------------------
-# Generic "insert into any table" page
-# ---------------------------
+
 
 def _row_get(row, key, idx=None):
     """db_read may return dict rows (cursor(dictionary=True)) or tuples; support both."""
