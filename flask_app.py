@@ -172,7 +172,7 @@ def add_todo():
 
 
 
-@app.route("/kriminelle", methods=["POST"])
+@app.route("/kriminelle/add", methods=["POST"])
 @login_required
 def add_kriminelle():
     name = request.form["name"]
@@ -189,7 +189,7 @@ def add_kriminelle():
 
     return redirect(url_for("index"))
 
-@app.route("/verbrechen", methods=["POST"])
+@app.route("/verbrechen/add", methods=["POST"])
 @login_required
 def add_verbrechen():
     verbrechenstyp = request.form["verbrechenstyp"]
@@ -203,7 +203,7 @@ def add_verbrechen():
         VALUES (%s, %s, %s, %s)
     """, (verbrechenstyp, geldstrafe, gefaengniszeit, vergehen))
 
-@app.route("/gefaengnis", methods=["POST"])
+@app.route("/gefaengnis/add", methods=["POST"])
 @login_required
 def add_gefaengnis():
     ort = request.form["ort"]
