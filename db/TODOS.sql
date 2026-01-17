@@ -14,11 +14,16 @@ CREATE TABLE todos (
 
 CREATE TABLE kriminelle ( 
 foto INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(40) ,
-    geburtsdatum CHAR(10),
-    ethnie VARCHAR(20),
-    haftstatus BOOL,
-    geschlecht VARCHAR(10)
+    Name VARCHAR(40) ,
+    Geschlecht VARCHAR(10),
+    Ethnie VARCHAR(20),
+    Geburtsdatum CHAR(10),
+    Geburtsort VARCHAR (100),
+    Haarfarbe VARCHAR (25),
+    Augenfarbe VARCHAR (25),
+    Gewicht VARCHAR (10),
+    Körpergrösse CHAR(10),
+    Nationalität (35),
 );
 
 CREATE TABLE verbrechen (
