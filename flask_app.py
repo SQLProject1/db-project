@@ -413,12 +413,6 @@ def insert_data():
         columns=columns,
     )
 
-@app.route("/haeftlinge")
-@login_required
-def show_haeftlinge():
-    haeftlinge = db_read("SELECT * FROM haeftlinge")
-    return render_template("table.html", title="Häftlinge", rows=haeftlinge)
-
 
 @app.route("/verbrechen")
 @login_required
@@ -426,12 +420,6 @@ def show_verbrechen():
     verbrechen = db_read("SELECT * FROM verbrechen")
     return render_template("table.html", title="Verbrechen", rows=verbrechen)
 
-
-@app.route("/gefaengnis")
-@login_required
-def show_gefaengnis():
-    gefaengnis = db_read("SELECT * FROM gefaengnis")
-    return render_template("table.html", title="Gefängnisse", rows=gefaengnis)
 
 if __name__ == "__main__":
     app.run()
