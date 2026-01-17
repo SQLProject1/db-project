@@ -145,14 +145,11 @@ def add_data():
 """
 
 @app.route("/")
+@login_required
 def index():
     # Fetch existing posts to show on the front page
     sql = "SELECT * FROM posts ORDER BY created_at DESC"
     posts = db_read(sql)
-    
-    # You can also fetch other tables if needed
-    # For example, if you have a 'todos' table:
-    # todos = db_read("SELECT * FROM todos ORDER BY created_at DESC")
     
     return render_template("index.html", posts=posts)
 
