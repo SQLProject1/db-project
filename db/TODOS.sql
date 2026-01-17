@@ -37,10 +37,13 @@ CREATE TABLE verbrechen (
 );
 
 CREATE TABLE gefaengnis (
-    gefängnis_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Ort varchar(67),
-    Sicherheitslevel varchar(1)
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100),
+    Standort VARCHAR(100),
+    Kapazität CHAR(100),
+    Sicherheitsstufe VARCHAR(20),
 );
+
 
 CREATE TABLE posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
