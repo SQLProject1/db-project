@@ -145,7 +145,6 @@ def add_data():
 """
 
 @app.route("/")
-@login_required
 def index():
     # Fetch existing posts to show on the front page
     sql = "SELECT * FROM posts ORDER BY created_at DESC"
