@@ -171,9 +171,9 @@ def add_todo():
 
 
 
-@app.route("/kriminelle/add", methods=["POST"])
+@app.route("/haeftlinge/add", methods=["POST"])
 @login_required
-def add_kriminelle():
+def add_haeftlinge():
     name = request.form["name"]
     geburtsdatum = request.form["geburtsdatum"]
     ethnie = request.form["ethnie"]
@@ -181,7 +181,7 @@ def add_kriminelle():
     geschlecht = request.form["geschlecht"]
 
     db_write("""
-        INSERT INTO kriminelle
+        INSERT INTO haeftlinge
         (name, geburtsdatum, ethnie, haftstatus, geschlecht)
         VALUES (%s, %s, %s, %s, %s)
     """, (name, geburtsdatum, ethnie, haftstatus, geschlecht))
@@ -390,11 +390,11 @@ def insert_data():
         columns=columns,
     )
 
-@app.route("/kriminelle")
+@app.route("/haeftlinge")
 @login_required
-def show_kriminelle():
-    kriminelle = db_read("SELECT * FROM kriminelle")
-    return render_template("table.html", title="Kriminelle", rows=kriminelle)
+def show_haeftlinge():
+    haeftlinge = db_read("SELECT * FROM haeftlinge")
+    return render_template("table.html", title="haeftlinge", rows=haeftlinge)
 
 
 @app.route("/verbrechen")
