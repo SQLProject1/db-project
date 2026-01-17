@@ -394,8 +394,25 @@ def insert_data():
         columns=columns,
     )
 
+@app.route("/kriminelle")
+@login_required
+def show_kriminelle():
+    kriminelle = db_read("SELECT * FROM kriminelle")
+    return render_template("table.html", title="Kriminelle", rows=kriminelle)
 
 
+@app.route("/verbrechen")
+@login_required
+def show_verbrechen():
+    verbrechen = db_read("SELECT * FROM verbrechen")
+    return render_template("table.html", title="Verbrechen", rows=verbrechen)
+
+
+@app.route("/gefaengnis")
+@login_required
+def show_gefaengnis():
+    gefaengnis = db_read("SELECT * FROM gefaengnis")
+    return render_template("table.html", title="Gefängnisse", rows=gefaengnis)
 
 if __name__ == "__main__":
     app.run()
