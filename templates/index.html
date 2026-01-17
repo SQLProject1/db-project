@@ -11,14 +11,19 @@
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}">Meine Website</a>
             <div class="navbar-nav ms-auto">
-                {% if current_user.is_authenticated %}
-                    <span class="nav-item nav-link">Hallo, {{ current_user.username }}</span>
-                    <a class="nav-item nav-link" href="{{ url_for('logout') }}">Ausloggen</a>
-                {% else %}
-                    <a class="nav-item nav-link" href="{{ url_for('login') }}">Einloggen</a>
-                    <a class="nav-item nav-link" href="{{ url_for('register') }}">Registrieren</a>
-                {% endif %}
-            </div>
+    {% if current_user.is_authenticated %}
+        <a class="nav-item nav-link" href="{{ url_for('show_kriminelle') }}">Kriminelle</a>
+        <a class="nav-item nav-link" href="{{ url_for('show_verbrechen') }}">Verbrechen</a>
+        <a class="nav-item nav-link" href="{{ url_for('show_gefaengnis') }}">Gefängnis</a>
+
+        <span class="nav-item nav-link">Hallo, {{ current_user.username }}</span>
+        <a class="nav-item nav-link" href="{{ url_for('logout') }}">Ausloggen</a>
+    {% else %}
+        <a class="nav-item nav-link" href="{{ url_for('login') }}">Einloggen</a>
+        <a class="nav-item nav-link" href="{{ url_for('register') }}">Registrieren</a>
+    {% endif %}
+</div>
+
         </div>
     </nav>
 
