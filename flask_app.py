@@ -171,9 +171,9 @@ def add_todo():
 
 
 
-@app.route("/haeftlinge")
+@app.route("/haeftlinge_search")
 @login_required
-def show_haeftlinge_search():
+def show_haeftlinge():
     search_col = request.args.get("column")
     search_val = request.args.get("q")
 
@@ -196,6 +196,7 @@ def show_haeftlinge_search():
         search_col=search_col,
         search_val=search_val
     )
+
 
 
 
